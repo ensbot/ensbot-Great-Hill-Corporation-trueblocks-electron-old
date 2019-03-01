@@ -67,7 +67,6 @@ export default class TxChart extends Component {
     let ticks = tickFn('weeks');
     x.domain(ticks);
 
-    //console.log(x.domain());
     y.domain([
       0,
       d3.max(data, function(d) {
@@ -76,14 +75,18 @@ export default class TxChart extends Component {
     ]);
 
     const xAxis = d3.axisBottom(x)
-      .tickFormat(d3.timeFormat("%Y-%m-%d"))
-      .tickValues(ticks.filter((tick, i) => {return i % 4 === 0}))
-      ,
-      yAxis = d3.axisLeft(y);
+      .tickFormat(d3.timeFormat("%b %d, %Y"))
+      .ticks(5);
+      //.tickValues(ticks.filter((tick, i) => {return i % 2 === 0}));
+      
+    const yAxis = d3.axisLeft(y)
+      .ticks(5);
+      //.tickValues(ticks.filter((tick, i) => {return i % 2 === 0}));
 
       let tooltip = d3.select("body").append("div")
           .attr("class", "tooltip")
-          .style("opacity", 0);
+          .style("opacity", 0)
+          .style("display", "none");
 
     focus.selectAll("bar")
     .data(data)
@@ -96,6 +99,7 @@ export default class TxChart extends Component {
     .on("mouseover", function(d) {
       tooltip.transition()
           .duration(200)
+          .style("display", "block")
           .style("opacity", .9);
       tooltip.html(`
         <strong>${d.date.toDateString()}</strong> (week)<br/>
@@ -107,7 +111,8 @@ export default class TxChart extends Component {
     .on("mouseout", function(d) {
           tooltip.transition()
               .duration(500)
-              .style("opacity", 0);
+              .style("opacity", 0)
+              .style("display", "none");
     });
 
 

@@ -2,4 +2,9 @@
     "name": "Foundation Tip Jar",
     "address": "0xfB6916095ca1df60bB79Ce92cE3Ea74c37c5d359",
     "visible": true
+},
+{
+    "name": "Giveth Donation Jar",
+    "address": "0x5adf43dd006c6c36506e2b2dfa352e60002d22dc",
+    "visible": true
 }]

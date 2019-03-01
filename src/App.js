@@ -27,7 +27,8 @@ export default class App extends Component {
       indexSync: 7201241,
       fetchStatus: "",
       startBlock: 0,
-      endBlock: 7201241
+      endBlock: 7201241,
+      nav: "summary"
     };
   }
 
@@ -74,7 +75,18 @@ export default class App extends Component {
       this.setState({fetchStatus: "export", currentAddress: address})
       return this.delay(500, res.json())})
     .then((res) => {
-      console.log(res);
+      res = res.map(tx => {
+        if(tx.to === address | tx.from === address) {
+          tx.type = "top-level";
+        } else if(tx.receipt.logs.articulatedLog &&
+          tx.receipt.logs.articulatedLog.inputs.filter(input => input.val === address).length) {
+            tx.type = "log"
+          } else {
+            tx.type = "unknown"
+          }
+        return tx;
+      })
+      console.log(res)
       this.setState({data: res, isLoaded: true, fetchStatus: "complete"});
     })
   }
@@ -98,62 +110,86 @@ export default class App extends Component {
         </div>
         <div className="command-center">
         <form className="address-selector" onSubmit={this.handleSubmit}>
-        <select className="address-input" name="inputAddress" value={this.state.inputAddress} onChange={this.handleInputChange}>
-          <option value="">Select a monitor...</option>
-          {addressList.map((monitor) => {return monitor.visible &&
-            <option value={monitor.address}>{monitor.name}</option>
-            }
-          )}
-        </select>
-          {/* <input className="address-input" type="text" name="inputAddress" placeholder="Enter an address" value={this.state.val} onChange={this.handleInputChange}/> */}
-          {/* <input className="submit" type="submit" value="Fetch"/> */}
-          </form>
-        {console.log(this.state.fetchStatus)}
+          <select className="address-input" name="inputAddress" value={this.state.inputAddress} onChange={this.handleInputChange}>
+            <option value="">Select a monitor...</option>
+            {addressList.map((monitor) => {return monitor.visible &&
+              <option value={monitor.address}>{monitor.name}</option>
+            })}
+          </select>
+        </form>
         <div className={"fetch-progress " + (this.state.fetchStatus === "complete" ? "complete" : "")}>
           <div className={"status-box " + (this.state.fetchStatus === "req" ? "active" : "")}>
             <div className="blip"></div>
             <div className="info">{this.fetchStatuses.indexOf(this.state.fetchStatus) < 1 ? "Initializing..." : "Cache initialized"}</div>
+
           </div>
+          <div className="arrows">→</div>
           <div className={"status-box " + (this.state.fetchStatus === "freshen" ? "active" : "")}>
            <div className="blip"></div>
            <div className="info">{this.fetchStatuses.indexOf(this.state.fetchStatus) < 2 ? "Freshening cache..." : "Freshened cache"}</div>
           </div>
+          <div className="arrows">→</div>
           <div className={"status-box " + (this.state.fetchStatus === "export" ? "active" : "")}>
             <div className="blip"></div>
             <div className="info">{this.fetchStatuses.indexOf(this.state.fetchStatus) < 3 ? "Exporting from RPC..." : "Exported from RPC"}</div>
           </div>
         </div>
         </div>
-        <div className="tab-nav">
-        <a>Summary</a>
-        <a>Detail</a>
-        </div>
         <div className="main-content">
-            <SummaryView {...this.state}/>
+        <h2>Results</h2>
+        {/* <h3>Address {this.state.currentAddress}</h3> */}
+        <p>Block range: {this.state.startBlock} - {this.state.endBlock}</p>
+        <div className="tab-nav">
+          <a className={this.state.nav === "summary" ? "selected" : ""} onClick={() => this.setState({nav: "summary"})}>Summary</a>
+          <a className={this.state.nav === "detail" ? "selected" : ""} onClick={() => this.setState({nav: "detail"})}>Detail</a>
+          <a className="download" href={'data:application/json;charset=utf-8;,' + encodeURIComponent(JSON.stringify(this.props.data))} download={this.props.address+".json"}>Download JSON</a>
+          <a className="download">Download CSV</a>
+        </div>
+        {this.state.nav === "summary" &&
+        <SummaryView currentAddress={this.state.currentAddress}
+          data={this.state.data}
+          startBlock={this.state.startBlock}
+          endBlock={this.state.endBlock}
+          fetchStatus={this.state.fetchStatus}/>
+          }
+        {this.state.nav === "detail" &&
+          <DetailView data={this.state.data}/>
+        }
         </div>
       </div>
     );
   }
 }
 
-const SummaryView = (props) => {
-  return (
-    <div>
-      <div><TxChart data={props.data} width="500" height="250"/></div>
+class SummaryView extends Component {
+  constructor(props) {
+    super(props);
+
+  }
+
+  shouldComponentUpdate = (nextProps) => {
+    return this.props.fetchStatus !== "complete"
+  }
+
+  componentDidMount = () => {
+  }
+  
+  render() {
+    return (
       <div>
-        <div className="data-description">
-        {props.currentAddress &&
-        <div>
-            <h5>Appearances for address {props.currentAddress}.</h5>
-            <p>Start block: {props.startBlock}</p>
-            <p>End block: {props.endBlock}</p>
-            <a href={'data:application/json;charset=utf-8;,' + encodeURIComponent(JSON.stringify(props.data))} download={props.address+".json"}>Download</a>
+         <div>
+          <div className="data-description">
+          {this.props.currentAddress &&
+          <div>
+              <p>Total appearances: {this.props.data.reduce((prev) => prev+1, 0)}</p>
+          </div>
+          }
+              </div>
         </div>
-        }
-            </div>
+        <div><TxChart data={this.props.data} width="500" height="250"/></div>
       </div>
-    </div>
-  )
+    )
+  }
 }
 
 const DetailView = (props) => {
