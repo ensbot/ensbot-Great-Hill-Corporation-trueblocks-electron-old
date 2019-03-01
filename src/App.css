@@ -1,0 +1,149 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  /* animation: App-logo-spin infinite 20s linear; */
+  height: 80px;
+}
+
+.App-header {
+  background-color: #222;
+  /* height: 150px; */
+  padding: 20px;
+  color: white;
+}
+
+.App-header h1 {
+  font-size: 1em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.App-intro {
+  font-size: large;
+}
+
+
+
+.system-monitors {
+  display: flex;
+  justify-content: center;
+}
+
+.system-monitors .monitor {
+  margin: 1em;
+}
+
+.system-monitors .heading {
+  font-size: .8em;
+  background-color: #090;
+  padding: .2em .4em;
+  border-radius: .3em;
+}
+
+.system-monitors .info {
+  margin: .2em;
+  font-size: .8em;
+}
+
+.command-center {
+  background-color: #05405f;
+  color: #FFF;
+}
+
+.address-selector {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin: 0 auto;
+}
+
+.address-selector .address-input {
+  /* width: 50%; */
+  display: block;
+  /* padding: 3em; */
+  line-height: 3em;
+  background-color: inherit;
+  color: #FFF;
+  font-size: 1em;
+  border: 1px solid #FFF;
+  width: 30em;
+  margin: 1em auto;
+}
+
+.address-selector .submit {
+  margin: 1em;
+}
+
+.fetch-progress {
+  display: flex;
+  justify-content: space-between;
+  padding: 1em 5em;
+}
+
+.fetch-progress .status-box {
+  text-align: center;
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+.fetch-progress .status-box .blip {
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  background-color: #EEE;
+  margin: 0 auto;
+}
+
+.status-box .info {
+  font-size: .8em;
+  margin-top: .5em;
+  color: #BBB;
+}
+
+.status-box.active .blip {
+  animation: progress-beacon infinite 4s ease alternate;
+}
+
+.fetch-progress .status-box.complete {
+  color: #CCC;
+}
+
+.fetch-progress .status-box.complete .blip {
+
+}
+
+
+@keyframes progress-beacon {
+  0% {
+    background-color: inherit;
+  }
+  50% {
+    background-color: blue;
+  }
+  100% {
+    background-color: inherit;
+  }
+}
+
+
+.main-content {
+  display: flex;
+  justify-content: space-around;
+}
+
+.ReactTable {
+  font-size: .8em;
+}
+
+.tooltip {
+  background-color: #fff;
+  border-radius: 2px;
+  padding: 5px;
+  font-size: .7em;
+  cursor: default;
+  line-height: 1em;
+  position: absolute;
+}
