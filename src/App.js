@@ -132,7 +132,7 @@ export default class App extends Component {
         {this.state.currentAddress &&
         <div className="main-content">
 
-        <h2>Results</h2>
+        <h2>Export Results</h2>
         <p>(Block range: {this.state.startBlock} - {this.state.endBlock})</p>
         <div className="tab-nav">
           <a className={this.state.nav === "summary" ? "selected" : ""} onClick={() => this.setState({nav: "summary"})}>Summary</a>
