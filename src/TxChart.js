@@ -31,7 +31,7 @@ export default class TxChart extends Component {
           // price is count
           toplevel: datum[1].toplevel || 0,
           log:      datum[1].log || 0,
-          unknown:  datum[1].unknown || 0
+          misc:  datum[1].misc || 0
         //   type: 
         }
       })
@@ -41,12 +41,11 @@ export default class TxChart extends Component {
   renderChart = () => {
     if (!this.props.data.length) return null;
     let data = this.formatDataForChart(this.props.data, "timestamp");
-    console.log(data);
-    let formatDate = d3.timeFormat("%Y %W");
+    // let formatDate = d3.timeFormat("%Y %W");
     const svg = d3.select("svg"),
       margin = {
         top: 20,
-        right: 20,
+        right: 70,
         bottom: 110,
         left: 40
       },
@@ -55,6 +54,10 @@ export default class TxChart extends Component {
 
     svg.selectAll("*").remove();
 
+
+    let series = d3.stack()
+    .keys(["toplevel", "log", "misc"])
+    (data);
 
     const x = d3.scaleBand().rangeRound([0, width]).paddingInner(0.05),
       y = d3.scaleLinear().range([height, 0]);
@@ -78,7 +81,7 @@ export default class TxChart extends Component {
     y.domain([
       0,
       d3.max(data, function(d) {
-        return d.log + d.unknown + d.toplevel;
+        return d.log + d.misc + d.toplevel;
       })
     ]);
 
@@ -96,9 +99,6 @@ export default class TxChart extends Component {
           .style("opacity", 0)
           .style("display", "none");
 
-    let series = d3.stack()
-    .keys(["toplevel", "log", "unknown"])
-    (data);
 
     focus.selectAll("g")
     .data(series)
@@ -121,7 +121,7 @@ export default class TxChart extends Component {
         <strong>${d.data.date.toDateString()}</strong> (week)<br/>
         ${d.data.toplevel} from tx 'from' | 'to'<br/>
         ${d.data.log} from tx log<br/>
-        ${d.data.unknown} from tx abyss
+        ${d.data.misc} from tx abyss
         `)
       .style("left", (d3.event.pageX + 10) + "px")
       .style("top", (d3.event.pageY - 28) + "px")
@@ -133,6 +133,33 @@ export default class TxChart extends Component {
               .style("display", "none");
     });
 
+    const legend = svg => {
+        console.log(series);
+        const g = svg
+            .attr("font-family", "sans-serif")
+            .attr("font-size", 10)
+            .attr("text-anchor", "end")
+          .selectAll("g")
+          .data(series)
+          .join("g")
+            .attr("transform", (d, i) => `translate(0,${i * 20})`);
+      
+        g.append("rect")
+            .attr("x", -19)
+            .attr("width", 19)
+            .attr("height", 19)
+            .attr("fill", d => z(d.key));
+      
+        g.append("text")
+            .attr("x", -24)
+            .attr("y", 9.5)
+            .attr("dy", "0.35em")
+            .text(d => d.key);
+      }
+
+      focus.append("g")
+      .attr("transform", `translate(${width + margin.right-10},${margin.top})`)
+      .call(legend);
 
     focus.append("g").attr("class", "axis axis--x")
       .attr("transform", "translate(0," + height + ")")

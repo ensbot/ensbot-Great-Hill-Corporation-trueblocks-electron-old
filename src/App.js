@@ -82,7 +82,7 @@ export default class App extends Component {
           tx.receipt.logs.articulatedLog.inputs.filter(input => input.val.toUpperCase() === address.toUpperCase()).length) {
             tx.type = "log"
           } else {
-            tx.type = "unknown"
+            tx.type = "misc"
           }
         return tx;
       })
@@ -138,11 +138,11 @@ export default class App extends Component {
         <div className="main-content">
         <h2>Results</h2>
         {/* <h3>Address {this.state.currentAddress}</h3> */}
-        <p>Block range: {this.state.startBlock} - {this.state.endBlock}</p>
+        <p>(Block range: {this.state.startBlock} - {this.state.endBlock})</p>
         <div className="tab-nav">
           <a className={this.state.nav === "summary" ? "selected" : ""} onClick={() => this.setState({nav: "summary"})}>Summary</a>
           <a className={this.state.nav === "detail" ? "selected" : ""} onClick={() => this.setState({nav: "detail"})}>Detail</a>
-          <a className="download" href={'data:application/json;charset=utf-8;,' + encodeURIComponent(JSON.stringify(this.props.data))} download={this.props.address+".json"}>Download JSON</a>
+          <a className="download" href={'data:application/json;charset=utf-8;,' + encodeURIComponent(JSON.stringify(this.props.data))} download={this.props.currentAddress+this.state.startBlock+"-"+this.state.endBlock+".json"}>Download JSON</a>
           <a className="download">Download CSV</a>
         </div>
         {this.state.nav === "summary" &&
@@ -209,11 +209,17 @@ class Table extends Component {
   this.columns = [
     {
       id: 'timestamp',
-      Header: 'UTC Timestamp',
+      Header: 'Timestamp (UTC)',
       accessor: d => new Date(d.timestamp*1000).toLocaleString('en-US', {timeZone:'UTC'})
     }, {
       Header: 'Block Number',
       accessor: "blockNumber"
+    }, {
+      Header: 'Tx Index',
+      accessor: "transactionIndex"
+    }, {
+      Header: 'Tx Hash',
+      accessor: "hash",
     },
     {
       Header: 'From',
@@ -222,8 +228,8 @@ class Table extends Component {
       Header: 'To',
       accessor: 'to',
     }, {
-      Header: 'Value (wei)',
-      accessor: 'value',
+      Header: 'Type',
+      accessor: 'type',
     }
   ]
 }
