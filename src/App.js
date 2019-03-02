@@ -76,7 +76,6 @@ export default class App extends Component {
       return this.delay(500, res.json())})
     .then((res) => {
       res = res.map(tx => {
-        console.log(`address: ${address} to: ${tx.to} from: ${tx.from}`)
         if(tx.to.toUpperCase() === address.toUpperCase() | tx.from.toUpperCase() === address.toUpperCase()) {
           tx.type = "toplevel";
         } else if(tx.receipt.logs.articulatedLog &&

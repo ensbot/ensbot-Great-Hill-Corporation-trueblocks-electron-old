@@ -19,15 +19,9 @@ export default class TxChart extends Component {
         datum.monthYear = formatDate(new Date(datum[timeCol] * 1000));
         return datum;
       })
-    //   .reduce((acc, cur) => {
-    //     acc[cur.monthYear][cur.type] = (acc[cur.monthYear][cur.type] || 0) +1;
-    //     return acc;
-    //   }, {}))
       .reduce((acc, cur) => {
         acc[cur.monthYear] = acc[cur.monthYear] || {};
-        console.log(acc[cur.monthYear])
         acc[cur.monthYear][cur.type] = acc[cur.monthYear][cur.type] || 0;
-        console.log(acc[cur.monthYear][cur.type]);
         acc[cur.monthYear][cur.type]++;
         return acc;
       }, {}))
