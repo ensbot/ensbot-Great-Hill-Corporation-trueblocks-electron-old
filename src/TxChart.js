@@ -12,21 +12,33 @@ export default class TxChart extends Component {
   formatDataForChart = (data, timeCol) => {
     const parseDate = d3.timeParse("%Y %W"),
     formatDate = d3.timeFormat("%Y %W");
+
     return Object.entries(
       data
       .map((datum) => {
         datum.monthYear = formatDate(new Date(datum[timeCol] * 1000));
         return datum;
       })
+    //   .reduce((acc, cur) => {
+    //     acc[cur.monthYear][cur.type] = (acc[cur.monthYear][cur.type] || 0) +1;
+    //     return acc;
+    //   }, {}))
       .reduce((acc, cur) => {
-        acc[cur.monthYear] = (acc[cur.monthYear] || 0) +1;
+        acc[cur.monthYear] = acc[cur.monthYear] || {};
+        console.log(acc[cur.monthYear])
+        acc[cur.monthYear][cur.type] = acc[cur.monthYear][cur.type] || 0;
+        console.log(acc[cur.monthYear][cur.type]);
+        acc[cur.monthYear][cur.type]++;
         return acc;
       }, {}))
-      .map((datum) => {// XXX:
+      .map((datum) => {
         return {
           date: parseDate(datum[0]),
           // price is count
-          price: +datum[1]
+          toplevel: datum[1].toplevel || 0,
+          log:      datum[1].log || 0,
+          unknown:  datum[1].unknown || 0
+        //   type: 
         }
       })
       .sort((a,b) => a.date - b.date);
@@ -49,8 +61,10 @@ export default class TxChart extends Component {
 
     svg.selectAll("*").remove();
 
+
     const x = d3.scaleBand().rangeRound([0, width]).paddingInner(0.05),
       y = d3.scaleLinear().range([height, 0]);
+      const z = d3.scaleOrdinal(d3.schemeCategory10);
 
     svg.append("defs").append("clipPath").attr("id", "clip").append("rect").attr("width", width).attr("height", height);
 
@@ -70,7 +84,7 @@ export default class TxChart extends Component {
     y.domain([
       0,
       d3.max(data, function(d) {
-        return d.price;
+        return d.log + d.unknown + d.toplevel;
       })
     ]);
 
@@ -88,22 +102,32 @@ export default class TxChart extends Component {
           .style("opacity", 0)
           .style("display", "none");
 
-    focus.selectAll("bar")
-    .data(data)
-  .enter().append("rect")
+    let series = d3.stack()
+    .keys(["toplevel", "log", "unknown"])
+    (data);
+
+    focus.selectAll("g")
+    .data(series)
+    .enter().append("g")
+        .attr("fill", (d) => z(d.key))
+    .selectAll("rect")
+    .data((d) => d)
+    .enter().append("rect")
     .attr("class", "bar-rect")
-    .attr("x", (d) => x(d.date))
+    .attr("x", (d) => x(d.data.date))
     .attr("width", x.bandwidth())
-    .attr("y", (d) =>y(d.price))
-    .attr("height", (d) => height - y(d.price))
+    .attr("y", (d) =>y(d[1]))
+    .attr("height", (d) => y(d[0]) - y(d[1]))
     .on("mouseover", function(d) {
       tooltip.transition()
           .duration(200)
           .style("display", "block")
           .style("opacity", .9);
       tooltip.html(`
-        <strong>${d.date.toDateString()}</strong> (week)<br/>
-        ${d.price} Transactions
+        <strong>${d.data.date.toDateString()}</strong> (week)<br/>
+        ${d.data.toplevel} from tx 'from' | 'to'<br/>
+        ${d.data.log} from tx log<br/>
+        ${d.data.unknown} from tx abyss
         `)
       .style("left", (d3.event.pageX + 10) + "px")
       .style("top", (d3.event.pageY - 28) + "px")

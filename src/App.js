@@ -76,10 +76,11 @@ export default class App extends Component {
       return this.delay(500, res.json())})
     .then((res) => {
       res = res.map(tx => {
-        if(tx.to === address | tx.from === address) {
-          tx.type = "top-level";
+        console.log(`address: ${address} to: ${tx.to} from: ${tx.from}`)
+        if(tx.to.toUpperCase() === address.toUpperCase() | tx.from.toUpperCase() === address.toUpperCase()) {
+          tx.type = "toplevel";
         } else if(tx.receipt.logs.articulatedLog &&
-          tx.receipt.logs.articulatedLog.inputs.filter(input => input.val === address).length) {
+          tx.receipt.logs.articulatedLog.inputs.filter(input => input.val.toUpperCase() === address.toUpperCase()).length) {
             tx.type = "log"
           } else {
             tx.type = "unknown"

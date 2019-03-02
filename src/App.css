@@ -179,9 +179,9 @@
   font-size: .8em;
 }
 
-.bar-rect {
+/* .bar-rect {
   fill: #9bb3c5;
-}
+} */
 
 .bar-rect:hover {
   fill: #b4cbdc;
