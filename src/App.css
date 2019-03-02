@@ -81,14 +81,16 @@
   display: flex;
   justify-content: space-between;
   padding: 1em 5em;
-  color: #BBB;
+  color: #000;
   align-items: center;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
 .fetch-progress .arrows {
   font-family: sans-serif;
   font-size: 2em;
-  color: #AAA;
+  color: #000;
   /* line-height: .5em; */
   /* flex-grow: 1; */
   /* flex-basis: 0; */
@@ -104,7 +106,8 @@
   width: 1em;
   height: 1em;
   border-radius: 50%;
-  background-color: #EEE;
+  border: 1px solid #000;
+  /* background-color: #EEE; */
   margin: 0 auto;
 }
 
@@ -122,11 +125,11 @@
 }
 
 .fetch-progress.complete .status-box {
-  color: #ACA;
+  color: #449844;
 }
 
 .fetch-progress.complete .status-box .blip {
-  background-color:#ACA;
+  background-color:#449844;
 }
 
 
@@ -147,6 +150,18 @@
   display: flex;
   justify-content: space-around;
   flex-direction: column;
+}
+
+.main-content h2 {
+  margin-bottom: 0;
+}
+
+.main-content p {
+  font-size: .8em;
+}
+
+.tab-nav {
+  margin-bottom: 1.5em;
 }
 
 .tab-nav a {

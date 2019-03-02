@@ -26,8 +26,8 @@ export default class App extends Component {
       nodeSync: 7245315,
       indexSync: 7201241,
       fetchStatus: "",
-      startBlock: 0,
-      endBlock: 7201241,
+      startBlock: "0000000",
+      endBlock: "7201241",
       nav: "summary"
     };
   }
@@ -51,12 +51,6 @@ export default class App extends Component {
     this.setState({[e.target.name]: e.target.value}, 
       () => this.fetchData("export", this.state.inputAddress))  
   }
-
-  // downloadData = () => {
-  //   let filename = `${this.state.address}.json`;
-  //   let contentType = "application/json;charset=utf-8;";
-  //   'data:' + contentType + ',' + encodeURIComponent(JSON.stringify(this.state.data));
-  // }
 
   delay = (t, v) => {
     return new Promise(function(resolve) { 
@@ -135,9 +129,10 @@ export default class App extends Component {
           </div>
         </div>
         </div>
+        {this.state.currentAddress &&
         <div className="main-content">
+
         <h2>Results</h2>
-        {/* <h3>Address {this.state.currentAddress}</h3> */}
         <p>(Block range: {this.state.startBlock} - {this.state.endBlock})</p>
         <div className="tab-nav">
           <a className={this.state.nav === "summary" ? "selected" : ""} onClick={() => this.setState({nav: "summary"})}>Summary</a>
@@ -156,6 +151,7 @@ export default class App extends Component {
           <DetailView data={this.state.data}/>
         }
         </div>
+        }
       </div>
     );
   }
