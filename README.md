@@ -14,9 +14,7 @@ npm run dev & node src/electron-wait-react.js
 optional: install mock json server (mocks json response)
 
 ```
-cd test-server
-npm install
-cd ..
+cd test-server && npm install && cd ..
 ```
 
 
