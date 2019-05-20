@@ -3,9 +3,13 @@ const electron = require('electron');
 const app = electron.app;
 // Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
-
+const {spawn} = require('child_process');
 const path = require('path');
 const url = require('url');
+// const console = require('console');
+// app.console = new console.Console(process.stdout, process.stderr);
+
+ipcMain = electron.ipcMain;
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -58,3 +62,23 @@ app.on('activate', function () {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
+
+console.log("maybe works");
+ipcMain.on('chifra', (event, arg) => {
+    console.log("calling chifra");
+    let chifra = spawn('chifra', ['ls', '--nocolor']);
+    chifra.on('error', (err) => {
+        console.log('failed to start process',err);
+      });
+
+    let output = '';
+    chifra.stdout.on("data", (data) => {
+        // var part = buffer.read().toString();
+        console.log(data)
+        output += data;
+    })
+    chifra.stdout.on("close", (signal) => {
+        console.log(output)
+        event.sender.send('chifra-res', output)
+    })
+})

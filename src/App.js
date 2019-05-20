@@ -6,6 +6,13 @@ import 'react-table/react-table.css';
 import TxChart from './TxChart';
 import addressList from './address-list.json';
 
+const electron = window.require('electron');
+const ipcRenderer  = electron.ipcRenderer;
+
+// import { remote } from 'electron'; 
+// var electronFs = remote.require('fs');
+// const dialog = remote.require('dialog');
+
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -28,11 +35,13 @@ export default class App extends Component {
       fetchStatus: "",
       startBlock: "0000000",
       endBlock: "7201241",
-      nav: "summary"
+      nav: "summary",
+      randomStuff: ""
     };
   }
 
   componentDidMount = () => {
+    console.log("hey")
     this.fakeSystemSync();
   }
 
@@ -61,7 +70,7 @@ export default class App extends Component {
   fetchData = (command, address) => {
     this.setState({fetchStatus: "req"});
     console.log(address);
-    this.delay(700).then(() => fetch(`http://localhost:8090/export?address=${address}`))
+    this.delay(700).then(() => fetch(`http://localhost:8080/export?address=${address}`))
     .then(res => {
       this.setState({fetchStatus: "freshen"});
       return this.delay(1000, res)})
@@ -83,7 +92,22 @@ export default class App extends Component {
       console.log(res)
       this.setState({data: res, isLoaded: true, fetchStatus: "complete"});
     })
+    .catch((e) => {
+      this.setState({error: "error: cannot fetch data. Perhaps your API isn't running. Perhaps there's a JSON error (e.g. empty result)."});
+    })
+  
   }
+  
+  executeCommand = () => {
+
+    ipcRenderer.send("chifra", "ls")
+    ipcRenderer.on('chifra-res', (event, data) => {
+      console.log(data);
+      this.setState({randomStuff: data})
+    })  
+    //this.setState({randomStuff: "hey"})
+  }
+
 
   render() {
     return (
@@ -111,6 +135,7 @@ export default class App extends Component {
             })}
           </select>
         </form>
+        <div className="errorBox">{this.state.error}</div>
         <div className={"fetch-progress " + (this.state.fetchStatus === "complete" ? "complete" : "")}>
           <div className={"status-box " + (this.state.fetchStatus === "req" ? "active" : "")}>
             <div className="blip"></div>
@@ -129,6 +154,9 @@ export default class App extends Component {
           </div>
         </div>
         </div>
+        <div className="randomStuff"><button onClick={this.executeCommand}>get random stuff</button>
+        <br/>
+        {this.state.randomStuff}</div>
         {this.state.currentAddress &&
         <div className="main-content">
 
